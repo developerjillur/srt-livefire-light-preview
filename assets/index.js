@@ -61,13 +61,20 @@ class Component extends PageLogic {
       });
     });
     this._go = go;
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) this._timer = setInterval(() => go(this._i + 1), 7000);
+    this._paused = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pause = root.querySelector('[data-carousel-pause]');
+    const stop = () => { this._paused = true; clearInterval(this._timer); if(pause){pause.textContent='Play slideshow';pause.setAttribute('aria-pressed','true');} };
+    pause?.addEventListener('click',()=>{if(this._paused){this._paused=false;this._restart(go);pause.textContent='Pause slideshow';pause.setAttribute('aria-pressed','false');}else stop();});
+    root.querySelector('#top')?.addEventListener('focusin',event=>{if(event.target!==pause)stop();});
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{if(e.matches)stop();});
+    if(this._paused&&pause){pause.textContent='Play slideshow';pause.setAttribute('aria-pressed','true');}
+    if (!this._paused && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) this._timer = setInterval(() => go(this._i + 1), 7000);
     paint();
   }
 
   _restart(go) {
     if (this._timer) clearInterval(this._timer);
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) this._timer = setInterval(() => go(this._i + 1), 7000);
+    if (!this._paused && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) this._timer = setInterval(() => go(this._i + 1), 7000);
   }
 
   _initReveal(root) {
@@ -211,8 +218,8 @@ const app=new Component({});const bindings=[{"id":"1","kind":"text","expr":"\"{{
 const evaluate=(expr,scope)=>new Function(...Object.keys(scope),'evaluate','scope','return ('+expr+')')(...Object.values(scope),evaluate,scope);
 function getScope(binding){let scope=app.renderVals();for(const s of binding.scopes) scope={...scope,[s.as]:evaluate(s.expr,scope)[s.index]};return scope;}
 for(const el of document.querySelectorAll('[data-ref]')) app[el.dataset.ref].current=el;
-function update(){for(const b of bindings){if(b.kind==='event')continue;const el=document.querySelector('[data-bind="'+b.id+'"]');const val=evaluate(b.expr,getScope(b));if(b.kind==='text')el.textContent=val;else if(b.kind==='condition'){el.style.display=val?'contents':'none';el.querySelectorAll('input,select,textarea').forEach(f=>f.disabled=!val);}else el.setAttribute(b.attr,val);}}
-app.update=update;for(const b of bindings)if(b.kind==='event'){document.querySelector('[data-bind="'+b.id+'"]').addEventListener(b.attr,e=>evaluate(b.expr,getScope(b))(e));}
+function update(){for(const b of bindings){if(b.kind==='event')continue;const el=document.querySelector('[data-bind="'+b.id+'"]');if(!el)continue;const val=evaluate(b.expr,getScope(b));if(b.kind==='text')el.textContent=val;else if(b.kind==='condition'){el.style.display=val?'contents':'none';el.querySelectorAll('input,select,textarea').forEach(f=>f.disabled=!val);}else el.setAttribute(b.attr,val);}}
+app.update=update;for(const b of bindings)if(b.kind==='event'){document.querySelector('[data-bind="'+b.id+'"]')?.addEventListener(b.attr,e=>evaluate(b.expr,getScope(b))(e));}
 update();app.componentDidMount();
 
 })();

@@ -2,8 +2,10 @@
 
 Seven-page website published by Jillur Rahman.
 
-Static HTML, CSS and JavaScript. Serve this directory with `python3 -m http.server 4197`.
+The final direction retains the Light Preview foundation and incorporates the range-oriented header/navigation and categorized Media presentation from the alternative redesign. The Test/Forensics announcement is excluded. Existing imagery is retained.
 
-The supplied design, content and images are preserved. Mobile navigation, carousel, accordions and gallery interactions are included. The contact form is a clearly labelled design preview and does not send inquiries. Google Fonts and linked YouTube videos require internet access.
+Static HTML, CSS and JavaScript. Serve this directory with `python3 -m http.server 4197`. Google Fonts, HubSpot and YouTube require internet access.
+
+The Contact page loads the existing HubSpot enquiry form. Form rendering has been checked; no test enquiry was sent. This is the HTML reference for the subsequent WordPress implementation, not the migrated production site.
 
 GitHub Pages serves the main branch root. This preview is excluded from search indexing.
